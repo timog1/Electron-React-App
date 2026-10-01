@@ -1,0 +1,21 @@
+.tierlist {
+
+    border-collapse: collapse;
+}
+.tierlist th,
+.tierlist td {
+    border: 1px solid #444;
+    padding: 10px;
+    text-align: center;
+}
+.tierlist td {
+    height: 100px;
+}
+.tierlist-image{
+    max-height:220px;
+    max-width: 220px;
+}
+.media-image{
+    max-height:220px;
+    max-width: 220px;
+}

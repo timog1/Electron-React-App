@@ -4,7 +4,7 @@ import { useFilePicker } from "../Context/useFilePicker.tsx";
 
 import Gamebuttons from "../Gamebuttons/Gamebuttons.tsx";
 import GameOptions from "../GameOptions/GameOptions.tsx";
-
+import {useGameRound} from "../Games/hooks/useGameRound.tsx";
 interface HostProps {
 
     lobby: SteamLobby | null;
@@ -15,6 +15,7 @@ interface HostProps {
 
 function HostLobby({lobby, setLobby, changeLobby}: HostProps ) {
     const { infoText } = useFilePicker();
+
     async function sendGameInfo(){
         if(!lobby || !lobby.game) {
             console.log("error")

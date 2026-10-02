@@ -1,11 +1,11 @@
 import { Navigate} from "react-router-dom";
 import Tierlist from "./Tierlist.tsx";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import CurrentMedia from "./CurrentMedia.tsx";
 import TierlistReader from "./TierlistReader.ts";
 import { useLocation } from "react-router-dom";
-import {useEffect} from "react";
-import useGameRound from "../hooks/round.tsx"
+import {place_Image} from "./place_Image.ts"
+import {useGameRound} from "../hooks/useGameRound.tsx"
 interface TierlistClientProps {
 
     playerId: string;
@@ -21,69 +21,56 @@ type PlacedImage = {
 };
 
 function TierlistClient({  members,playerId }: TierlistClientProps) {
-    let [round, setRound] = useGameRound();
+    const {round, roundInfo}= useGameRound("client");
     const { state } = useLocation();
     const amountOfRows = state.rows
     const info = TierlistReader.parse(state.infoText)[round];
     console.log(round)
     const currentImage = info[0]
     const currentText = info[1]
+    console.log("round:" +roundInfo)
+
+    const [placedImages, setPlacedImages] = useState<PlacedImage[]>([]);
+
     useEffect(() => {
-        return window.steam.onMessage((msg) => {
-            onNext(msg);
+        if (!roundInfo) return;
+
+        const positions = new Map(roundInfo);
+
+        const resolvedRound = round - 1;
+
+        const info =
+            TierlistReader.parse(state.infoText)[resolvedRound];
+
+        if (!info) return;
+
+        const media = info[0];
+
+        positions.forEach((row, player) => {
+            place_Image(
+                setPlacedImages,
+                resolvedRound,
+                row,
+                player,
+                media
+            );
         });
-    }, []);
-    function onNext(message: SteamIncomingMessage<unknown>){
-        console.log(message)
-
-        if(message.message === "next"){
-            console.log("message:" + message)
-
-            setRound((prev): number => {return prev + 1})
-        }
-
-    }
-
-
-
+    }, [roundInfo, round, state.infoText]);
     if (!members) {
         return <Navigate to="/" replace />;
     }
 
 
-    let [placedImages, setPlacedImages] = useState<PlacedImage[]>([]);
+
+
     function placeImage(row: number, player: string) {
         player = playerId
         console.log(playerId)
         console.log(round)
         window.steam.sendMessage(members[0].id, row)
         if (!currentImage) return;
+        place_Image(setPlacedImages,round, row,player,currentImage)
 
-        setPlacedImages(prev => {
-            const existing = prev.find(
-                image => image.id === round
-            );
-
-            if (existing) {
-                // Bild verschieben
-                return prev.map(image =>
-                    image.id === round
-                        ? { ...image, row, player }
-                        : image
-                );
-            }
-
-            // Bild zum ersten Mal platzieren
-            return [
-                ...prev,
-                {
-                    id: round,
-                    media: currentImage,
-                    row,
-                    player,
-                },
-            ];
-        });
     }
     return (
         <div>

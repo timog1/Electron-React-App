@@ -30,7 +30,7 @@ declare global {
     interface SteamIncomingMessage<T = unknown> {
         /** SteamID64 of the sender */
         from: string;
-        /** Whatever the sender passed to sendMessage / broadcastMessage */
+        type: string;
         message: T;
     }
 

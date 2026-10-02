@@ -4,12 +4,11 @@ import {useEffect, useState} from "react";
 import {useFilePicker} from "../../Context/useFilePicker.tsx";
 import CurrentMedia from "./CurrentMedia.tsx";
 import TierlistReader from "./TierlistReader.ts";
-
+import {useGameRound} from "../hooks/useGameRound.tsx";
+import {place_Image} from "./place_Image.ts";
 interface TierlistHostProps {
-
     amountOfRows: number;
     members: SteamLobbyMember[] | null;
-
 }
 type PlacedImage = {
     id: number;
@@ -17,67 +16,75 @@ type PlacedImage = {
     row: number;
     player: string;
 };
+function TierlistHost({
+                          amountOfRows,
+                          members
+                      }: TierlistHostProps) {
 
-function TierlistHost({ amountOfRows, members }: TierlistHostProps) {
-    const [round, setRound] = useState<number>(0);
-    const [placedImages, setPlacedImages] = useState<PlacedImage[]>([]);
+    const [placedImages, setPlacedImages] =
+        useState<PlacedImage[]>([]);
 
+    const [roundImages, setRoundImages] =
+        useState<Map<string, number>>(new Map());
 
+    const {
+        round,
+        nextRound
+    } = useGameRound("host");
 
     const { infoText } = useFilePicker();
-    const allInfo = TierlistReader.parse(infoText)[round]
+
+    const allInfo =
+        TierlistReader.parse(infoText)[round];
+
     const currentImage = allInfo[0];
-    const currentText = allInfo[1]
+    const currentText = allInfo[1];
+
     useEffect(() => {
         return window.steam.onMessage((message) => {
-            if (Number.isInteger(message.message)) {
-                placeImage(message.message, message.from);
+            const row = Number(message.message);
+
+            if (!Number.isInteger(row)) {
+                return;
             }
+
+            placeImage(row, message.from);
         });
     }, [round, currentImage]);
+
+    function placeImage(row: number, player: string) {
+        if (!currentImage) return;
+
+        // Geheime Picks der aktuellen Runde
+        setRoundImages(prev => {
+            const next = new Map(prev);
+            next.set(player, row);
+            return next;
+        });
+
+        // Host sieht die Picks natürlich sofort
+        place_Image(
+            setPlacedImages,
+            round,
+            row,
+            player,
+            currentImage
+        );
+    }
+
+    async function handleNextRound() {
+
+        const data = Array.from(roundImages.entries());
+        await nextRound(data);
+
+
+        setRoundImages(new Map());
+    }
+
     if (!members) {
         return <Navigate to="/" replace />;
     }
 
-
-    console.log(allInfo)
-    function next() {
-        window.steam.broadcastMessage("next");
-        setRound(prev => prev + 1);
-        console.log(round)
-
-    }
-
-    function placeImage(row: unknown, player: string) {
-       // window.steam.sendMessage(members[0].id, row)
-        if(!Number.isInteger(row)) return;
-        console.log("round:" + round)
-        setPlacedImages(prev => {
-            const existing = prev.find(
-                image => image.id === round
-            );
-
-            if (existing) {
-                // Bild verschieben
-                return prev.map(image =>
-                    image.id === round
-                        ? { ...image, row, player }
-                        : image
-                );
-            }
-
-            // Bild zum ersten Mal platzieren
-            return [
-                ...prev,
-                {
-                    id: round,
-                    media: currentImage,
-                    row,
-                    player,
-                },
-            ];
-        });
-    }
     return (
         <div>
             <Tierlist
@@ -87,11 +94,14 @@ function TierlistHost({ amountOfRows, members }: TierlistHostProps) {
                 onCellClick={placeImage}
             />
 
-            <CurrentMedia currentText={currentText}
-            currentImage={currentImage}></CurrentMedia>
-            <button onClick={next}>next</button>
+            <CurrentMedia
+                currentText={currentText}
+                currentImage={currentImage}
+            />
+
+            <button onClick={handleNextRound}>
+                next
+            </button>
         </div>
     );
-}
-
-export default TierlistHost;
+} export default TierlistHost

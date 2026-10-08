@@ -4,7 +4,6 @@ import { useFilePicker } from "../Context/useFilePicker.tsx";
 
 import Gamebuttons from "../Gamebuttons/Gamebuttons.tsx";
 import GameOptions from "../GameOptions/GameOptions.tsx";
-import {useGameRound} from "../Games/hooks/useGameRound.tsx";
 interface HostProps {
 
     lobby: SteamLobby | null;
@@ -82,7 +81,7 @@ function HostLobby({lobby, setLobby, changeLobby}: HostProps ) {
             <p>
                 Spiel: <strong>{lobby.game}</strong>
             </p>
-            <GameOptions Game={lobby.game}></GameOptions>
+            <GameOptions changeLobby={changeLobby} Game={lobby.game}></GameOptions>
 
             <p>
                 Status: <strong>{lobby.state}</strong>

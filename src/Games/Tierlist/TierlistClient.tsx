@@ -6,8 +6,9 @@ import TierlistReader from "./TierlistReader.ts";
 import { useLocation } from "react-router-dom";
 import {place_Image} from "./place_Image.ts"
 import {useGameRound} from "../hooks/useGameRound.tsx"
+import type {TierlistOptions} from "./TierlistOptions.ts";
 interface TierlistClientProps {
-
+    Options: TierlistOptions | string;
     playerId: string;
     members: SteamLobbyMember[] | null;
 
@@ -17,10 +18,15 @@ type PlacedImage = {
     media: string;
     row: number;
     player: string;
-
 };
 
-function TierlistClient({  members,playerId }: TierlistClientProps) {
+function TierlistClient({  members,playerId, Options }: TierlistClientProps) {
+    let options: TierlistOptions;
+    if(typeof Options === "string"){
+        options = JSON.parse(Options);
+    } else{
+        options =  Options
+    }
     const {round, roundInfo}= useGameRound("client");
     const { state } = useLocation();
     const amountOfRows = state.rows
@@ -29,9 +35,7 @@ function TierlistClient({  members,playerId }: TierlistClientProps) {
     const currentImage = info[0]
     const currentText = info[1]
     console.log("round:" +roundInfo)
-
     const [placedImages, setPlacedImages] = useState<PlacedImage[]>([]);
-
     useEffect(() => {
         if (!roundInfo) return;
 
@@ -56,9 +60,11 @@ function TierlistClient({  members,playerId }: TierlistClientProps) {
             );
         });
     }, [roundInfo, round, state.infoText]);
+
     if (!members) {
         return <Navigate to="/" replace />;
     }
+
 
 
 
@@ -72,17 +78,22 @@ function TierlistClient({  members,playerId }: TierlistClientProps) {
         place_Image(setPlacedImages,round, row,player,currentImage)
 
     }
+
+
     return (
-        <div>
+        <div className="container">
+            <div className={"box"}>
             <Tierlist
                 amountOfRows={amountOfRows}
                 members={members}
                 placedImages={placedImages}
                 onCellClick={placeImage}
+                HostPlays={options.hostPlays}
             />
-
+            </div>
+            <div className={"CurrentMedia box"}>
             <CurrentMedia currentImage={currentImage} currentText={ currentText}></CurrentMedia>
-
+            </div>
         </div>
     );
 }

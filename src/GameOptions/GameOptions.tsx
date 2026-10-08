@@ -1,36 +1,32 @@
-
-import Tierlist from "./Tierlist.tsx"
+import Tierlist from "./TierlistOptions.tsx";
 import ZahlenErraten from "./ZahlenErraten.tsx";
-interface TierlistOptionsProps{
 
-    Game:  string | null;
+interface GameOptionsProps {
+    changeLobby: (key: string, value: string) => void;
+    Game: string | null;
 }
 
-function TierlistOptions({Game}: TierlistOptionsProps) {
+const games = {
+    Tierlist,
+    "2I1T": ZahlenErraten,
+};
 
-    const games = {
-        "Tierlist": Tierlist,
-        "2I1T": ZahlenErraten,
-    };
-    if (!Game) return null;
-
-    let GameComponent = null;
-
-    if (Game === "Tierlist") {
-        GameComponent = games[Game];
+function GameOptions({ Game, changeLobby }: GameOptionsProps) {
+    if (!Game) {
+        return null;
     }
-    if (Game === "2I1T") {
-        GameComponent = games[Game];
-    }
+
+    const GameComponent = games[Game as keyof typeof games];
+
     if (!GameComponent) {
         return null;
     }
 
-    return(
-    <div>
+    return (
+        <div>
+            <GameComponent changeLobby={changeLobby} />
+        </div>
+    );
+}
 
-            <GameComponent></GameComponent>
-    </div>
-    )
-
-} export default TierlistOptions
+export default GameOptions;

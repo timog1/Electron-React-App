@@ -1,24 +1,34 @@
 import './Tierlist.css'
 import type { PlacedImage } from "./TierlistHost.tsx";
 
+import MediaThumbnail from "./MediaThumbnail.tsx"
 interface TierlistProps{
     amountOfRows: number;
    members: SteamLobbyMember[];
     placedImages: PlacedImage[];
     onCellClick: (row: number, player: string) => void;
+    HostPlays: boolean;
+
 }
 
-function Tierlist({amountOfRows, members, placedImages, onCellClick}: TierlistProps) {
+function Tierlist({amountOfRows, members, placedImages, onCellClick, HostPlays}: TierlistProps) {
+    let players = members;
+    console.log(HostPlays)
+    console.log(players)
 
 
+    if (!HostPlays) {
+        players = members.filter((_, index) => index !== 0);
+    }
+    console.log(players)
     return (
-        <div>
+
             <table className="tierlist">
                 <thead>
                 <tr>
                     <th>#</th>
 
-                    {members.map((player) => (
+                    {players.map((player) => (
                         <th key={player.id}>
                             {player.id}
                         </th>
@@ -36,7 +46,7 @@ function Tierlist({amountOfRows, members, placedImages, onCellClick}: TierlistPr
                         <tr key={row}>
                             <td>{row}</td>
 
-                            {members.map((player) => {
+                            {players.map((player) => {
 
                                 const playerName = player.id
 
@@ -57,12 +67,14 @@ function Tierlist({amountOfRows, members, placedImages, onCellClick}: TierlistPr
                                         }
                                     >
                                         {images.map((image, imageIndex) => (
-                                            <img
-                                                className={"tierlist-image"}
-                                                key={imageIndex}
-                                                src={image.media}
-                                                alt=""
+
+                                            <MediaThumbnail
+
+                                                imageIndex={imageIndex}
+                                                url={image.media}
+
                                             />
+
                                         ))}
                                     </td>
                                 );
@@ -73,6 +85,11 @@ function Tierlist({amountOfRows, members, placedImages, onCellClick}: TierlistPr
 
                 </tbody>
             </table>
-        </div>
+
     );
 }export default Tierlist
+
+
+
+
+

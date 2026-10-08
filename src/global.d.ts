@@ -45,6 +45,7 @@ declare global {
         members: SteamLobbyMember[];
         game: string | null;
         state: string | null;
+        gameOptions: string | null;
     }
     interface FileEntry {
         name: string;

@@ -61,7 +61,7 @@ function Startscreen({
     return (
 
         <div >
-            <h1>Friends Startscreen</h1>
+            <h1>JankBox</h1>
 
             <p>
                 Steam-Spieler: <strong>{playerName}</strong>

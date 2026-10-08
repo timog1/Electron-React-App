@@ -9,13 +9,32 @@
     text-align: center;
 }
 .tierlist td {
-    height: 100px;
+    height: 7vh;
 }
 .tierlist-image{
-    max-height:220px;
-    max-width: 220px;
+    max-height:8vh;
+    max-width: 8vw;
 }
 .media-image{
-    max-height:220px;
-    max-width: 220px;
+    max-height:500px;
+    max-width: 500px;
+}
+
+.container {
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+    gap: 60px;
+}
+.CurrentMedia{
+    border: 2px solid black;
+    padding: 20px;
+    border-radius: 8px;
+}
+.box{
+    border: 2px gray;
+    padding: 20px;
+    border-radius: 8px;
+    background-color: #1f2028;
 }

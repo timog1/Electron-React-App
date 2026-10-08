@@ -1,5 +1,5 @@
 import './Tierlist.css'
-
+import Media from "./Media.tsx"
 
 interface TierlistProps{
     currentImage: string;
@@ -9,11 +9,14 @@ interface TierlistProps{
 function CurrentMedia({currentText,currentImage}: TierlistProps){
 
 
-    return(
+    return (
 
-    <div>
-        <img className= {"media-image"}  src={currentImage}/>
-        <p>{currentText}</p>
-    </div>
+        <div >
+            <Media url={currentImage}></Media>
+
+            <p>{currentText}</p>
+        </div>
     )
-} export default CurrentMedia;
+}
+
+export default CurrentMedia;

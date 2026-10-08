@@ -45,7 +45,8 @@ function getLobbyData() {
             id: member.steamId64.toString()
         })),
         game: currentLobby.getData("game"),
-        state: currentLobby.getData("state")
+        state: currentLobby.getData("state"),
+        gameOptions: currentLobby.getData("gameOptions")
     };
 }
 
@@ -190,6 +191,7 @@ function registerIpcHandlers() {
 
         lobby.setData("game", "none");
         lobby.setData("state", "waiting");
+
 
         return getLobbyData();
     });

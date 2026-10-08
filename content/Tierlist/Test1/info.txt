@@ -1,3 +1,4 @@
 https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRoCMhbnb73wMSRjtHtMk9aqeJtehf33bfpnJSSlILr6UVvpcK2YbXDwfk&s=10|Text für Bild 1
 https://images.t-online.de/2026/01/cY6hmpBpGXQV/0x319:4000x2250/fit-in/1920x0/der-doener-fast-food-im-check.jpg|Text für Bild 2
 https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSeH5uxNC-SBSV6ReXJxrb7loyHWopf0djYgwyI6f5wCp5dOLokm1rawTg&s=10|Text für Bild 3
+https://www.youtube.com/watch?v=Gj0CYKH5mxM&list=RDGj0CYKH5mxM&start_radio=1|Video 1

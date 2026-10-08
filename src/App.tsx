@@ -41,8 +41,11 @@ function App() {
             .catch(console.error);
     }, []);
 
-    async function setlobbyall(key: string, value:string ){
+    async function setlobbyall(key: string, value:unknown ){
         if (!lobby) return;
+        if (typeof value === "object") {
+            value = JSON.stringify(value);
+        }
         setLobby((prev) => {
             if (!prev) return prev;
 
@@ -56,6 +59,13 @@ function App() {
     function getLobbyMembers(){
         if(!lobby) return null;
         return lobby.members
+    }
+    function getLobbyOptions(){
+
+        if(!lobby || !lobby.gameOptions) return false;
+        console.log("APP" + lobby.gameOptions)
+        return lobby.gameOptions;
+
     }
     return (
         <BrowserRouter>
@@ -87,6 +97,8 @@ function App() {
                     element={
                         <TierlistHost
                             amountOfRows={10}
+                            lobby={lobby}
+                            Options={getLobbyOptions()}
                             members={getLobbyMembers()}
                         />
                     }
@@ -94,20 +106,18 @@ function App() {
                 <Route
                     path="/HostLobby/:lobbyI/2I1T"
                     element={
-                        <ZahlenErratenHost
 
+                            <ZahlenErratenHost
                             members={getLobbyMembers()}
                         />
                     }
                 />
-
-
                 <Route
                     path="/PlayerLobby/:lobbyId"
                     element={
                         <PlayerLobby
                             lobby={lobby}
-
+                            Options={getLobbyOptions()}
                             setLobby={setLobby}
                         />
                     }

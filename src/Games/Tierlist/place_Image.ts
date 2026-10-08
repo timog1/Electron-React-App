@@ -3,15 +3,15 @@
 
 
 
-export function place_Image(setPlacedImages: (arg0: (prev: any) => any) => void, round, row, player, currentImage){
+export function place_Image(setPlacedImages: (arg0: (prev: any) => any) => void, round: number, row: unknown, player: unknown, currentImage: string){
     setPlacedImages(prev => {
         const existing = prev.find(
-            image => image.id === round && image.player === player
+            (image: { id: number; player: unknown; }) => image.id === round && image.player === player
         );
 
         if (existing) {
             // Bild verschieben
-            return prev.map(image =>
+            return prev.map((image: { id: number; player: unknown; }) =>
                 image.id === round && image.player === player
                     ? { ...image, row, player }
                     : image

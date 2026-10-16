@@ -8,10 +8,12 @@ interface TierlistOptionsProps {
 
 interface TierlistOptionsState {
     hostPlays: boolean;
+    videoasMP3: boolean;
 }
 
 const initialOptions: TierlistOptionsState = {
     hostPlays: false,
+    videoasMP3: false,
 };
 
 function TierlistOptions({ changeLobby }: TierlistOptionsProps) {
@@ -28,6 +30,13 @@ function TierlistOptions({ changeLobby }: TierlistOptionsProps) {
             hostPlays: e.target.checked,
         });
     }
+    function handlevideoasMP3Change(e: ChangeEvent<HTMLInputElement>) {
+        setOptions({
+            ...options,
+            videoasMP3: e.target.checked,
+        });
+    }
+
 
     return (
         <div>
@@ -43,6 +52,14 @@ function TierlistOptions({ changeLobby }: TierlistOptionsProps) {
                 />
                 Host Plays
             </label>
+            <label>
+            <input
+                type="checkbox"
+                checked={options.videoasMP3}
+                onChange={handlevideoasMP3Change}
+            />
+            Video als MP3
+        </label>
         </div>
     );
 }

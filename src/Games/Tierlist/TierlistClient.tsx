@@ -21,20 +21,23 @@ type PlacedImage = {
 };
 
 function TierlistClient({  members,playerId, Options }: TierlistClientProps) {
-    let options: TierlistOptions;
-    if(typeof Options === "string"){
-        options = JSON.parse(Options);
-    } else{
-        options =  Options
-    }
+
+    console.log("Options:" + Options);
+    console.log("Options:", Options);
+    console.log("Typ:", typeof Options);
+    const options: TierlistOptions =
+        typeof Options === "string"
+            ? JSON.parse(Options)
+            : Options;
+
+    console.log("Parsed options:", options);
+    console.log("hostPlays:", options.hostPlays);
     const {round, roundInfo}= useGameRound("client");
     const { state } = useLocation();
     const amountOfRows = state.rows
     const info = TierlistReader.parse(state.infoText)[round];
-    console.log(round)
     const currentImage = info[0]
     const currentText = info[1]
-    console.log("round:" +roundInfo)
     const [placedImages, setPlacedImages] = useState<PlacedImage[]>([]);
     useEffect(() => {
         if (!roundInfo) return;
@@ -92,7 +95,7 @@ function TierlistClient({  members,playerId, Options }: TierlistClientProps) {
             />
             </div>
             <div className={"CurrentMedia box"}>
-            <CurrentMedia currentImage={currentImage} currentText={ currentText}></CurrentMedia>
+            <CurrentMedia currentImage={currentImage} currentText={ currentText} isMP3={options.videoasMP3}   isHost={ false}></CurrentMedia>
             </div>
         </div>
     );

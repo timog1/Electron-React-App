@@ -117,7 +117,7 @@ function App() {
                     element={
                         <PlayerLobby
                             lobby={lobby}
-                            Options={getLobbyOptions()}
+
                             setLobby={setLobby}
                         />
                     }
@@ -129,6 +129,7 @@ function App() {
                         <TierlistClient
                             amountOfRows={10}
                             playerId={playerId}
+                            Options={getLobbyOptions()}
                             members={getLobbyMembers()}
                         />
                     }

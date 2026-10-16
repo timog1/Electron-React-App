@@ -115,3 +115,9 @@ button {
   height: 45px;
   width: 360px;
 }
+input{
+  margin: 10px;
+  border-radius: 10px;
+  height: 45px;
+  width: 360px;
+}

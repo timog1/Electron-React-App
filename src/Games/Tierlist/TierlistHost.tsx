@@ -113,6 +113,8 @@ function TierlistHost({
         </div>
             <div className={"CurrentMedia box"}>
             <CurrentMedia
+                isHost={true}
+                isMP3={options.videoasMP3}
                 currentText={currentText}
                 currentImage={currentImage}
             />

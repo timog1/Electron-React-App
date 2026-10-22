@@ -8,10 +8,11 @@ interface TierlistProps{
     placedImages: PlacedImage[];
     onCellClick: (row: number, player: string) => void;
     HostPlays: boolean;
+    imageText: string;
 
 }
 
-function Tierlist({amountOfRows, members, placedImages, onCellClick, HostPlays}: TierlistProps) {
+function Tierlist({amountOfRows, members, placedImages, onCellClick, HostPlays, imageText}: TierlistProps) {
     let players = members;
     console.log(HostPlays)
     console.log(players)
@@ -72,7 +73,7 @@ function Tierlist({amountOfRows, members, placedImages, onCellClick, HostPlays}:
 
                                                 imageIndex={imageIndex}
                                                 url={image.media}
-
+                                                imageText={imageText}
                                             />
 
                                         ))}

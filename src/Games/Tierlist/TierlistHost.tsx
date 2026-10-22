@@ -69,7 +69,7 @@ function TierlistHost({
 
     function placeImage(row: number, player: string) {
         if (!currentImage) return;
-
+        if(placedImages.find((image: {row: number, player: string}) => image.row === row && image.player === player)) return;
         // Geheime Picks der aktuellen Runde
         setRoundImages(prev => {
             const next = new Map(prev);
@@ -106,6 +106,7 @@ function TierlistHost({
             <Tierlist
                 amountOfRows={amountOfRows}
                 members={members}
+                imageText={currentText}
                 HostPlays={options.hostPlays}
                 placedImages={placedImages}
                 onCellClick={placeImage}

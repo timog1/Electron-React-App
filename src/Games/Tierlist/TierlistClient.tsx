@@ -74,8 +74,11 @@ function TierlistClient({  members,playerId, Options }: TierlistClientProps) {
 
     function placeImage(row: number, player: string) {
         player = playerId
+        if(placedImages.find((image: {row: number, player: string}) => image.row === row && image.player === player)) return;
+
         console.log(playerId)
-        console.log(round)
+
+            console.log(round)
         window.steam.sendMessage(members[0].id, row)
         if (!currentImage) return;
         place_Image(setPlacedImages,round, row,player,currentImage)

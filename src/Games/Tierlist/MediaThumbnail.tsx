@@ -1,36 +1,56 @@
-import {useMedia} from "../hooks/useMediaType.tsx";
 
-function MediaThumbnail({ url, imageIndex }: { url: string, imageIndex: number }) {
+import { useMedia } from "../hooks/useMediaType.tsx";
+import "./MediaThumbnail.css";
+
+function MediaThumbnail({
+                            url,
+                            imageIndex,
+                            imageText
+                        }: {
+    url: string;
+    imageIndex: number;
+    imageText: string;
+}) {
     const { type, youtubeId, handleImageError } = useMedia(url);
 
     if (type === "image") {
         return (
-            <img
-                className={"tierlist-image"}
-                src={url}
-                key={imageIndex}
-                alt=""
-                onError={handleImageError}
-            />
+            <div className="pictureDiv">
+                <img
+                    className="tierlist-image"
+                    src={url}
+                    key={imageIndex}
+                    alt=""
+                    onError={handleImageError}
+                />
+                <div className="textbackground">
+                    <p className="ImageText">{imageText}</p>
+                </div>
+            </div>
         );
     }
 
     if (type === "youtube" && youtubeId) {
         return (
-            <img
-                className={"tierlist-image"}
-                key={imageIndex}
-                src={`https://img.youtube.com/vi/${youtubeId}/maxresdefault.jpg`}
-                alt=""
-            />
+            <div className="pictureDiv">
+                <img
+                    className="tierlist-image"
+                    src={`https://img.youtube.com/vi/${youtubeId}/maxresdefault.jpg`}
+                    key={imageIndex}
+                    alt=""
+                />
+                <div className="textbackground">
+                    <p className="ImageText">{imageText}</p>
+                </div>
+            </div>
         );
     }
 
     if (type === "video") {
-        // Hier könntest du später ein Video-Thumbnail erzeugen
         return <p>Video</p>;
     }
 
     return <p>Medium konnte nicht geladen werden.</p>;
 }
-export default MediaThumbnail
+
+export default MediaThumbnail;

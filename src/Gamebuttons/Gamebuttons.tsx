@@ -16,7 +16,7 @@ function Gamebuttons({setLobby}: GamebuttonsProps) {
     return(
         <div>
             <button className="game-button" onClick={() => changeGame(("Tierlist"))}>Tierlist</button>
-            <button className="game-button" onClick={() => changeGame(("2I1T"))}>2Idiots1Thought</button>
+            <button className="game-button" onClick={() => changeGame(("2I1T"))}>WaveLength</button>
         </div>
     )
 }

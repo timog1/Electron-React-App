@@ -5,6 +5,7 @@
 
 export function place_Image(setPlacedImages: (arg0: (prev: any) => any) => void, round: number, row: unknown, player: unknown, currentImage: string){
     setPlacedImages(prev => {
+
         const existing = prev.find(
             (image: { id: number; player: unknown; }) => image.id === round && image.player === player
         );

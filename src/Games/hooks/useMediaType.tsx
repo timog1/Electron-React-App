@@ -1,6 +1,6 @@
 
 
-import {  useState } from "react";
+import {useEffect, useState} from "react";
 
 export type MediaType = "image" | "video" | "youtube" | "unknown";
 
@@ -24,7 +24,9 @@ export function getYoutubeId(url: string): string | null {
 
 export function useMedia(url: string) {
     const [type, setType] = useState<MediaType>("image");
-
+    useEffect(() => {
+        setType("image");
+    }, [url]);
 
 
     const handleImageError = () => {

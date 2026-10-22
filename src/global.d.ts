@@ -46,6 +46,7 @@ declare global {
         game: string | null;
         state: string | null;
         gameOptions: string | null;
+        Teams: Map<string, string[]>;
     }
     interface FileEntry {
         name: string;

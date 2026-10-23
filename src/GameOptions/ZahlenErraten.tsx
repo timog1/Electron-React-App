@@ -1,16 +1,14 @@
-
 import { useFilePicker } from "../Context/useFilePicker.tsx";
-import { useGameOptions } from "./useGameOptions.tsx";
 import Teams from "./Teams.tsx";
-import type { ChangeEvent } from "react";
-
-interface ZahlenErratenOptionsProps {
-    changeLobby: (key: string, value: unknown) => void;
-}
 
 interface ZahlenErratenOptionsState {
     hostPlays: boolean;
     simultanTurns: boolean;
+}
+
+interface ZahlenErratenOptionsProps {
+    lobby: SteamLobby;
+    changeLobby: (key: string, value: string) => void;
 }
 
 const initialOptions: ZahlenErratenOptionsState = {
@@ -19,36 +17,38 @@ const initialOptions: ZahlenErratenOptionsState = {
 };
 
 function ZahlenErratenOptions({
+                                  lobby,
                                   changeLobby,
                               }: ZahlenErratenOptionsProps) {
     const { openFilePicker } = useFilePicker();
 
-    const { options, setOptions } = useGameOptions(
-        initialOptions,
-        changeLobby
-    );
+    // Read the options directly from the lobby.
+    const options: ZahlenErratenOptionsState = lobby.gameOptions
+        ? {
+            ...initialOptions,
+            ...(typeof lobby.gameOptions === "string"
+                ? JSON.parse(lobby.gameOptions)
+                : lobby.gameOptions),
+        }
+        : initialOptions;
 
-    function handleHostPlaysChange(
-        e: ChangeEvent<HTMLInputElement>
+    function updateOption(
+        key: keyof ZahlenErratenOptionsState,
+        value: boolean
     ) {
-        setOptions({
-            ...options,
-            hostPlays: e.target.checked,
-        });
-    }
-
-    function handleSimultanTurnsChange(
-        e: ChangeEvent<HTMLInputElement>
-    ) {
-        setOptions({
-            ...options,
-            simultanTurns: e.target.checked,
-        });
+        changeLobby(
+            "gameOptions",
+            JSON.stringify({
+                ...options,
+                [key]: value,
+            })
+        );
     }
 
     return (
         <div>
             <button
+                type="button"
                 onClick={() => openFilePicker("ZahlenErraten")}
             >
                 Dokument auswählen
@@ -58,7 +58,9 @@ function ZahlenErratenOptions({
                 <input
                     type="checkbox"
                     checked={options.hostPlays}
-                    onChange={handleHostPlaysChange}
+                    onChange={(e) =>
+                        updateOption("hostPlays", e.target.checked)
+                    }
                 />
                 Host Plays
             </label>
@@ -67,12 +69,19 @@ function ZahlenErratenOptions({
                 <input
                     type="checkbox"
                     checked={options.simultanTurns}
-                    onChange={handleSimultanTurnsChange}
+                    onChange={(e) =>
+                        updateOption("simultanTurns", e.target.checked)
+                    }
                 />
                 Simultan Turns
             </label>
 
-            <Teams amountOfTeams={2}  />
+            <Teams
+                amountOfTeams={2}
+                lobby={lobby}
+                members={lobby.members}
+                changeLobby={changeLobby}
+            />
         </div>
     );
 }

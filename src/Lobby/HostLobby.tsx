@@ -81,7 +81,7 @@ function HostLobby({lobby, setLobby, changeLobby}: HostProps ) {
             <p>
                 Spiel: <strong>{lobby.game}</strong>
             </p>
-            <GameOptions changeLobby={changeLobby} Game={lobby.game} Teams={lobby.gameOptions}></GameOptions>
+            <GameOptions changeLobby={changeLobby} Game={lobby.game} lobby={lobby}></GameOptions>
 
             <p>
                 Status: <strong>{lobby.state}</strong>

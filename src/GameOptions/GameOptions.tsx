@@ -4,6 +4,7 @@ import ZahlenErraten from "./ZahlenErraten.tsx";
 interface GameOptionsProps {
     changeLobby: (key: string, value: string) => void;
     Game: string | null;
+    lobby: SteamLobby;
 }
 
 const games = {
@@ -11,7 +12,8 @@ const games = {
     "2I1T": ZahlenErraten,
 };
 
-function GameOptions({ Game, changeLobby }: GameOptionsProps) {
+function GameOptions({ Game, changeLobby, lobby }: GameOptionsProps) {
+
     if (!Game) {
         return null;
     }
@@ -24,7 +26,7 @@ function GameOptions({ Game, changeLobby }: GameOptionsProps) {
 
     return (
         <div>
-            <GameComponent changeLobby={changeLobby} />
+            <GameComponent changeLobby={changeLobby} lobby={lobby} />
         </div>
     );
 }

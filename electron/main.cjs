@@ -46,7 +46,8 @@ function getLobbyData() {
         })),
         game: currentLobby.getData("game"),
         state: currentLobby.getData("state"),
-        gameOptions: currentLobby.getData("gameOptions")
+        gameOptions: currentLobby.getData("gameOptions"),
+        teams: currentLobby.getData("teams")
     };
 }
 

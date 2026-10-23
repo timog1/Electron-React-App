@@ -1,14 +1,13 @@
 import { useFilePicker } from "../Context/useFilePicker.tsx";
-import { useGameOptions } from "./useGameOptions.tsx";
-import type { ChangeEvent } from "react";
-
-interface TierlistOptionsProps {
-    changeLobby: (key: string, value: unknown) => void;
-}
 
 interface TierlistOptionsState {
     hostPlays: boolean;
     videoasMP3: boolean;
+}
+
+interface TierlistOptionsProps {
+    lobby: SteamLobby;
+    changeLobby: (key: string, value: string) => void;
 }
 
 const initialOptions: TierlistOptionsState = {
@@ -16,31 +15,41 @@ const initialOptions: TierlistOptionsState = {
     videoasMP3: false,
 };
 
-function TierlistOptions({ changeLobby }: TierlistOptionsProps) {
+function TierlistOptions({
+                             lobby,
+                             changeLobby,
+                         }: TierlistOptionsProps) {
     const { openFilePicker } = useFilePicker();
 
-    const { options, setOptions } = useGameOptions(
-        initialOptions,
-        changeLobby
-    );
+    // Derive options directly from the lobby.
+    const options: TierlistOptionsState = lobby.gameOptions
+        ? {
+            ...initialOptions,
+            ...(typeof lobby.gameOptions === "string"
+                ? JSON.parse(lobby.gameOptions)
+                : lobby.gameOptions),
+        }
+        : initialOptions;
 
-    function handleHostPlaysChange(e: ChangeEvent<HTMLInputElement>) {
-        setOptions({
-            ...options,
-            hostPlays: e.target.checked,
-        });
+    function updateOption(
+        key: keyof TierlistOptionsState,
+        value: boolean
+    ) {
+        changeLobby(
+            "gameOptions",
+            JSON.stringify({
+                ...options,
+                [key]: value,
+            })
+        );
     }
-    function handlevideoasMP3Change(e: ChangeEvent<HTMLInputElement>) {
-        setOptions({
-            ...options,
-            videoasMP3: e.target.checked,
-        });
-    }
-
 
     return (
         <div>
-            <button onClick={() => openFilePicker("Tierlist")}>
+            <button
+                type="button"
+                onClick={() => openFilePicker("Tierlist")}
+            >
                 Dokument auswählen
             </button>
 
@@ -48,18 +57,23 @@ function TierlistOptions({ changeLobby }: TierlistOptionsProps) {
                 <input
                     type="checkbox"
                     checked={options.hostPlays}
-                    onChange={handleHostPlaysChange}
+                    onChange={(e) =>
+                        updateOption("hostPlays", e.target.checked)
+                    }
                 />
                 Host Plays
             </label>
+
             <label>
-            <input
-                type="checkbox"
-                checked={options.videoasMP3}
-                onChange={handlevideoasMP3Change}
-            />
-            Video als MP3
-        </label>
+                <input
+                    type="checkbox"
+                    checked={options.videoasMP3}
+                    onChange={(e) =>
+                        updateOption("videoasMP3", e.target.checked)
+                    }
+                />
+                Video als MP3
+            </label>
         </div>
     );
 }

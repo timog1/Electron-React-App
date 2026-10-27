@@ -60,6 +60,10 @@ function App() {
         if(!lobby) return null;
         return lobby.members
     }
+    function getLobbyOwner(){
+        if(!lobby) return null;
+        return lobby.owner
+    }
     function getLobbyOptions(){
 
         if(!lobby || !lobby.gameOptions) return false;
@@ -108,6 +112,7 @@ function App() {
                     element={
 
                             <ZahlenErratenHost
+                                owner={getLobbyOwner()}
                             members={getLobbyMembers()}
                         />
                     }

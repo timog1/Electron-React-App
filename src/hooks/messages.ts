@@ -18,4 +18,9 @@ export type GameMessage =
     | {
     type: "ROUND_NEXT";
     payload: {};
+    }
+    | {
+    type: "ZAHLEN_ERRATEN";
+    payload: {};
+
 };

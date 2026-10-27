@@ -1,5 +1,4 @@
 
-import type {GameMessage} from "./messages.ts"
 const listeners = new Map();
 
 function encode(type: string, payload = {}) {
@@ -11,25 +10,7 @@ function encode(type: string, payload = {}) {
     });
 }
 
-function decode(raw: unknown) {
-    try {
-        const message =
-            typeof raw === "string" ? JSON.parse(raw) : raw;
 
-        if (
-            !message ||
-            typeof message !== "object" ||
-            typeof message.type !== "string"
-        ) {
-            return null;
-        }
-
-        return message;
-    } catch (error) {
-        console.error("Invalid P2P message:", error);
-        return null;
-    }
-}
 
 export const connection = {
     broadcast(type: string, payload = {}) {
@@ -55,16 +36,5 @@ export const connection = {
         };
     },
 
-    handleIncoming(raw) {
-        const message = decode(raw);
-        if (!message) return;
 
-        listeners.get(message.type)?.forEach((callback) => {
-            try {
-                callback(message.payload, message);
-            } catch (error) {
-                console.error("Message handler failed:", error);
-            }
-        });
-    },
 };

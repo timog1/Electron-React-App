@@ -1,75 +1,52 @@
-# React + TypeScript + Vite
+# Partygame-Sammlung (Steam P2P)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Eine Sammlung von Partyspielen für Freunde, gebaut mit Electron, React und TypeScript.
+Die Spieler verbinden sich über Steam P2P miteinander, ein eigener Server ist nicht nötig.
 
-Currently, two official plugins are available:
+> 🚧 **Work in Progress:** Das Projekt ist in aktiver Entwicklung.
+> Es gibt noch Bugs, und nicht alle Spiele sind fertig.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Spiele
 
-## React Compiler
+### Tierlist (spielbar, noch buggy)
+Jeder Spieler hat eine eigene Rangliste von 1 bis 10. Die Begriffe werden den Plätzen
+zugeordnet, und jeder Platz kann nur einmal vergeben werden.
+falschen Zustand geraten.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### [Name des 2. Spiels] (in Entwicklung)
+[Ein Satz, worum es geht.] Dieses Spiel ist gerade in Arbeit und noch nicht spielbar.
 
-## Expanding the ESLint configuration
+## Tech-Stack
+- Electron
+- React + TypeScript + Vite
+- Steam P2P (Netzwerk)
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Bekannte Probleme
+- Tierlist: Prüfung fehlt noch, ob ein Spieler schon alles ausgewählt hat
+- Das zweite Spiel ist noch nicht fertig
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Starten
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+Voraussetzungen:
+- Node.js
+- Steam-Client läuft im Hintergrund und ist eingeloggt
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+Installation (einmalig):
 
-```
+    npm install
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+Dann in **zwei getrennten Terminals** (Reihenfolge beachten):
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+    # Terminal 1: Vite-Dev-Server
+    npm run dev
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+    # Terminal 2: Electron-App
+    npm run electron
 
-```
+> Aktuell ist das Projekt nur für die Entwicklung gedacht. Es gibt noch keinen fertigen Build.
+
+## Roadmap
+- [ ] UI/Design erstellen
+- [ ] Tierlist-Bugs beheben
+- [ ] Zweites Spiel fertigstellen
+- [ ] Weitere Spiele hinzufügen

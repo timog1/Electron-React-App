@@ -1,26 +1,39 @@
+
 import {
     createContext,
     useCallback,
     useContext,
     useEffect,
     useRef,
-    type ReactNode
+    type ReactNode,
 } from "react";
 
-import type { GameMessage } from "./messages.ts";
+import type {
+    GameMessage,
+    GameMessageMap,
+} from "./messages.ts";
 
-type IncomingMessage = {
-    from: string;
-    message: string;
-};
+type GameMessageType = keyof GameMessageMap;
 
-type MessageOfType<T extends GameMessageType> =
-    Extract<GameMessage, { type: T }>;
+type MessageOfType<T extends GameMessageType> = Extract<
+    GameMessage,
+    { type: T }
+>;
 
 type MessageHandler<T extends GameMessageType> = (
     message: MessageOfType<T>,
     from: string
 ) => void;
+
+type AnyMessageHandler = (
+    message: GameMessage,
+    from: string
+) => void;
+
+type IncomingMessage = {
+    from: string;
+    message: string;
+};
 
 type MessageContextType = {
     subscribe: <T extends GameMessageType>(
@@ -28,25 +41,17 @@ type MessageContextType = {
         handler: MessageHandler<T>
     ) => () => void;
 };
-type GameMessageType = GameMessage["type"];
 
-type AnyMessageHandler = (
-    message: GameMessage,
-    from: string
-) => void;
-
-const MessageContext =
-    createContext<MessageContextType | null>(null);
+const MessageContext = createContext<MessageContextType | null>(null);
 
 export function MessageProvider({
-                                    children
-                                }: {
+    children,
+}: {
     children: ReactNode;
 }) {
     const handlersRef = useRef(
         new Map<GameMessageType, Set<AnyMessageHandler>>()
     );
-
 
     const subscribe = useCallback(
         <T extends GameMessageType,>(
@@ -60,7 +65,7 @@ export function MessageProvider({
                 handlersRef.current.set(type, handlers);
             }
 
-            // Der Wrapper kapselt die interne Typumwandlung.
+            // Die Typumwandlung bleibt auf den internen Wrapper begrenzt.
             const wrappedHandler: AnyMessageHandler = (message, from) => {
                 handler(message as MessageOfType<T>, from);
             };
@@ -81,29 +86,40 @@ export function MessageProvider({
     useEffect(() => {
         const unsubscribe = window.steam.onMessage(
             (incoming: IncomingMessage) => {
-                let parsed: GameMessage;
+                let parsed: unknown;
 
                 try {
                     parsed = JSON.parse(incoming.message);
                 } catch {
-                    // Alte oder ungültige Nachrichten ignorieren
+                    // Ungültiges JSON ignorieren.
                     return;
                 }
 
+                // Grundlegende Prüfung der eingehenden Daten.
                 if (
                     !parsed ||
                     typeof parsed !== "object" ||
                     !("type" in parsed) ||
-                    typeof parsed.type !== "string"
+                    typeof parsed.type !== "string" ||
+                    !("payload" in parsed)
                 ) {
                     return;
                 }
 
-                const handlers =
-                    handlersRef.current.get(parsed.type);
+                // Der empfangene String ist zunächst nicht vertrauenswürdig.
+                const type = parsed.type as GameMessageType;
 
-                handlers?.forEach(handler => {
-                    handler(parsed, incoming.from);
+                const handlers = handlersRef.current.get(type);
+
+                if (!handlers) {
+                    // Für diesen Nachrichtentyp gibt es keine Listener.
+                    return;
+                }
+
+                // Die Laufzeitprüfung oben bestätigt noch nicht,
+                // dass das Payload dem jeweiligen TypeScript-Typ entspricht.
+                handlers.forEach((handler) => {
+                    handler(parsed as GameMessage, incoming.from);
                 });
             }
         );

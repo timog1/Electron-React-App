@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import {useGameMessage} from "../hooks/MessageProvider.tsx";
 
 interface PlayerProps {
     lobby: SteamLobby | null;
@@ -9,9 +10,9 @@ interface PlayerProps {
 function PlayerLobby({ lobby, setLobby }: PlayerProps) {
     const navigate = useNavigate();
 
-
+        useGameMessage("GAMESTART", (message, from) => console.log(message))
         console.log(lobby);
-        useEffect(() => {
+        /*useEffect(() => {
             const cleanup = window.steam.onMessage((msg) => {
                 console.log("MESSAGE:", msg);
 
@@ -36,7 +37,7 @@ function PlayerLobby({ lobby, setLobby }: PlayerProps) {
             });
 
             return cleanup;
-        }, []);
+        }, []); */
 
 
 

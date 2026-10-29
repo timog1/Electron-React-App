@@ -1,47 +1,30 @@
+
 import './ZahlenErraten.css'
-import {useState} from "react";
-import Skala from "./Skala.tsx";
-import HostControls from "./HostControls.tsx";
-import {useGameMessage} from "../../hooks/MessageProvider.tsx";
-import {connection} from "../../hooks/ConnectionLayer.ts";
 import type {TierlistOptions} from "../Tierlist/TierlistOptions.ts";
-import InputField from "./InputField.tsx";
+import ZahlenErratenClient from "./ZahlenErratenClient.tsx";
+import {roundStart} from "./Hostlogic.ts";
+
 
 interface TierlistProps{
     playerId: string;
     members: SteamLobbyMember[] | null;
     Options: TierlistOptions | string;
-    owner: string  null;
+    owner: string | null;
+    teams: Record<string, string[]>;
 }
 
-function ZahlenErratenClient({owner, Options}: TierlistProps){
-    const Frage = "hi";
-    if(!owner){
-        return
-    }
-    if (isHost){
-        roundStart();
-    }
-    //connection.broadcast()
-    function onMessage(){
 
-    }
-    const [changeState, setChangeState] = useState("F")
-    const [form, setForm] = useState()
-    useGameMessage("ZAHLEN_ERRATEN", onMessage);
+function ZahlenErratenHost({owner, Options, teams, playerId}: TierlistProps){
+    roundStart(teams, Frage);
+    useGameRound()
+
     return(
 
         <div>
-            <p className={"Frage"}></p>
-            { (changeState === "F") &&(
-            <HostControls></HostControls>
-            )}
-            {changeState === "F" ? (
-                <InputField owner={owner}></InputField>
-            ) : (
-                <Skala firstNumber={1} lastNumber={10} owner={owner}></Skala>
-            )}
+           <ZahlenErratenClient owner={owner} Options={Options} teams={teams} playerId={playerId}></ZahlenErratenClient>
 
         </div>
     )
-} export default ZahlenErratenClient;
+}
+
+export default ZahlenErratenHost;

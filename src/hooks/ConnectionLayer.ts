@@ -1,7 +1,17 @@
 
-const listeners = new Map();
+import type {
+    GameMessageMap,
+    GameMessageArgs,
+} from "./protocol";
 
-function encode(type: string, payload = {}) {
+const listeners = new Map<
+    keyof GameMessageMap,
+    Set<(payload: never) => void>
+>();
+
+function encode(...args: GameMessageArgs): string {
+    const [type, payload] = args;
+
     return JSON.stringify({
         type,
         payload,
@@ -10,31 +20,34 @@ function encode(type: string, payload = {}) {
     });
 }
 
-
-
 export const connection = {
-    broadcast(type: string, payload = {}) {
-        window.steam.broadcastMessage(encode(type, payload));
+    broadcast(...args: GameMessageArgs) {
+        window.steam.broadcastMessage(encode(...args));
     },
 
-    sendMessage(peerId, type: string, payload = {}) {
+    sendMessage(peerId: string, ...args: GameMessageArgs) {
         window.steam.sendMessage(
             peerId,
-            encode(type, payload)
+            encode(...args)
         );
     },
 
-    on(type: string, callback) {
-        if (!listeners.has(type)) {
-            listeners.set(type, new Set());
+    on<K extends keyof GameMessageMap>(
+        type: K,
+        callback: (payload: GameMessageMap[K]) => void
+    ) {
+        let handlers = listeners.get(type);
+
+        if (!handlers) {
+            handlers = new Set();
+            listeners.set(type, handlers);
         }
 
-        listeners.get(type).add(callback);
+        const handler = callback as (payload: never) => void;
+        handlers.add(handler);
 
         return () => {
-            listeners.get(type)?.delete(callback);
+            handlers?.delete(handler);
         };
     },
-
-
 };

@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 
 import { useFilePicker } from "./useFilePicker.tsx";
+import useSendInfo from "../hooks/useSendInfo.tsx";
 type FilePickerProps = {
     path: string | null;
     onClose: () => void;
@@ -14,9 +15,13 @@ export default function FilePicker({
     const [currentPath, setCurrentPath] = useState(path);
     const [entries, setEntries] = useState<FileEntry[]>([]);
     const [selectedEntry, setSelectedEntry] = useState<FileEntry | null>(null);
-
+    const {setInfo} = useSendInfo()
     const { infoText, setInfoText } = useFilePicker();
+    function setGameInfo(info: string){
+        setInfoText(info)
 
+        setInfo(info.split(/\r?\n/))
+    }
     async function onDoubleClick(entry: FileEntry) {
         // Datei
         if (!entry.isDirectory) {
@@ -41,14 +46,14 @@ const info = await window.fileSystem.readFile(infoPath);
 console.log("info.txt:", info);
 
 setSelectedEntry(entry);
-setInfoText(info);
+            setGameInfo(info);
 } catch {
     // Keine info.txt gefunden
     // -> Ordner öffnen
 
     setCurrentPath(entry.path);
     setSelectedEntry(null);
-    setInfoText("");
+            setGameInfo("");
 }
 }
 

@@ -6,6 +6,7 @@ import HostLobby from "./Lobby/HostLobby.tsx";
 import PlayerLobby from "./Lobby/PlayerLobby.tsx";
 import TierlistClient from "./Games/Tierlist/TierlistClient.tsx"
 import ZahlenErratenHost from "./Games/ZahlenErraten/ZahlenErratenHost.tsx";
+import ZahlenErratenClient from "./Games/ZahlenErraten/ZahlenErratenClient.tsx";
 
 function App() {
     const [playerName, setPlayerName] = useState("");
@@ -60,6 +61,10 @@ function App() {
         if(!lobby) return null;
         return lobby.members
     }
+    function getLobbyTeams(){
+        if(!lobby) return null;
+        return lobby.teams
+    }
     function getLobbyOwner(){
         if(!lobby) return null;
         return lobby.owner
@@ -112,7 +117,21 @@ function App() {
                     element={
 
                             <ZahlenErratenHost
+
+                                teams={getLobbyTeams()}
                                 owner={getLobbyOwner()}
+                            members={getLobbyMembers()}
+                        />
+                    }
+                />
+                <Route
+                    path="/HostLobby/:lobbyI/2I1T"
+                    element={
+
+                        <ZahlenErratenClient
+
+                            teams={getLobbyTeams()}
+                            owner={getLobbyOwner()}
                             members={getLobbyMembers()}
                         />
                     }

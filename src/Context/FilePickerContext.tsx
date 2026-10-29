@@ -22,6 +22,7 @@ export function FilePickerProvider({
 }) {
     const [isOpen, setIsOpen] = useState(false);
     const [path, setPath] = useState<string | null>(null);
+
     const [infoText, setInfoText] = useState("");
 
     function openFilePicker(path: string) {

@@ -4,6 +4,7 @@ import { useFilePicker } from "../Context/useFilePicker.tsx";
 
 import Gamebuttons from "../Gamebuttons/Gamebuttons.tsx";
 import GameOptions from "../GameOptions/GameOptions.tsx";
+import {connection} from "../hooks/ConnectionLayer.ts";
 interface HostProps {
 
     lobby: SteamLobby | null;
@@ -20,6 +21,7 @@ function HostLobby({lobby, setLobby, changeLobby}: HostProps ) {
             console.log("error")
             return;
         }
+        connection.broadcast("GAMESTART", "hi")
         const message = JSON.stringify({
             game: lobby.game,
             infoText: infoText,

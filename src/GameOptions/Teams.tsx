@@ -1,4 +1,3 @@
-
 import type { DragEvent } from "react";
 
 interface TeamPlayer {
@@ -6,9 +5,8 @@ interface TeamPlayer {
     name: string;
 }
 
-interface TeamAssignments {
-    [playerId: string]: number;
-}
+// { team1: [playerId, ...], team2: [...], ... }
+type TeamsObject = Record<string, string[]>;
 
 interface TeamsProps {
     amountOfTeams: number;
@@ -19,6 +17,46 @@ interface TeamsProps {
 
 interface GameOptions {
     hostPlays: boolean;
+}
+
+function teamKey(team: number): string {
+    return `team${team}`;
+}
+
+// '{"team1":["id1","id2"],"team2":["id3"]}' -> TeamsObject
+// Es sind immer genau team1..teamN vorhanden (fehlende = leeres Array).
+function parseTeams(raw: unknown, amountOfTeams: number): Record<string, string[]> {
+    let value: unknown = raw;
+
+    // Solange es noch ein String ist, parsen (deckt auch das doppelt escapte Format ab)
+    try {
+        for (let i = 0; i < 3 && typeof value === "string"; i++) {
+            value = JSON.parse(value);
+        }
+    } catch {
+        value = {};
+    }
+
+    const obj = (value && typeof value === "object" ? value : {}) as Record<string, unknown>;
+    const teams: Record<string, string[]> = {};
+
+    for (let team = 1; team <= amountOfTeams; team++) {
+        const ids = obj[`team${team}`];
+        teams[`team${team}`] = Array.isArray(ids) ? ids.map(String) : [];
+    }
+
+    return teams;
+}
+
+// TeamsObject -> JSON-String, IDs pro Team nach ID sortiert
+function serializeTeams(teams: TeamsObject): string {
+    const sorted: TeamsObject = {};
+
+    for (const key of Object.keys(teams)) {
+        sorted[key] = [...teams[key]].sort();
+    }
+
+    return JSON.stringify(sorted);
 }
 
 function Teams({
@@ -47,22 +85,8 @@ function Teams({
         }
     })();
 
-    // Parse saved team assignments.
-    const assignments: TeamAssignments = (() => {
-        const saved = lobby.teams;
-
-        if (!saved) {
-            return {};
-        }
-
-        try {
-            return typeof saved === "string"
-                ? JSON.parse(saved)
-                : saved;
-        } catch {
-            return {};
-        }
-    })();
+    // Gespeicherte Teams als Objekt einlesen.
+    const teams: TeamsObject = parseTeams(lobby.teams, amountOfTeams);
 
     // Exclude the host when hostPlays is false.
     const eligibleMembers = members.filter(
@@ -76,15 +100,19 @@ function Teams({
             return;
         }
 
-        const updated: TeamAssignments = { ...assignments };
+        const updated: TeamsObject = {};
 
-        if (team === null) {
-            delete updated[playerId];
-        } else {
-            updated[playerId] = team;
+        // Spieler aus allen Teams entfernen ...
+        for (const key of Object.keys(teams)) {
+            updated[key] = teams[key].filter((id) => id !== playerId);
         }
 
-        changeLobby("teams", JSON.stringify(updated));
+        // ... und im Zielteam hinzufügen (bei null bleibt er ohne Team).
+        if (team !== null) {
+            updated[teamKey(team)].push(playerId);
+        }
+
+        changeLobby("teams", serializeTeams(updated));
     }
 
     function handleDragStart(
@@ -116,8 +144,11 @@ function Teams({
         event.dataTransfer.dropEffect = "move";
     }
 
+    // Alle IDs, die in irgendeinem Team stehen.
+    const assignedIds = new Set(Object.values(teams).flat());
+
     const unassigned = eligibleMembers.filter(
-        (member) => !assignments[member.id]
+        (member) => !assignedIds.has(member.id)
     );
 
     return (
@@ -173,9 +204,10 @@ function Teams({
                     { length: amountOfTeams },
                     (_, index) => index + 1
                 ).map((teamNumber) => {
-                    const teamMembers = eligibleMembers.filter(
-                        (member) =>
-                            assignments[member.id] === teamNumber
+                    const teamIds = teams[teamKey(teamNumber)];
+
+                    const teamMembers = eligibleMembers.filter((member) =>
+                        teamIds.includes(member.id)
                     );
 
                     return (

@@ -1,10 +1,12 @@
 import {connection} from "../../hooks/ConnectionLayer.ts";
 
-
-function sendToEach(message, team, except) {
+export const teamConnetion = {
+    sendToEach(message: string, team: any, except: string | any[])
+{
     for (const player of team) {
         if (!except.includes(player)) {
             connection.sendMessage(message, player);
         }
     }
+}
 }

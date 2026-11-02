@@ -8,11 +8,18 @@ declare module "../../hooks/messages.ts" {
             number: number;
         };
         ZAHLEN_ERRATEN_ROLE: {
-            role: string;
+            role: "picker" | "rater";
+            number: number | null;
         };
-        ZAHLEN_ERRATEN_FRAGE: {
-            frage: string;
-        };
+        ZAHLEN_ERRATEN_ANTWORT:{
+            antwort: string;
+
+        }
+        ZAHLEN_ERRATEN_SUBMIT:{
+            antwort: string;
+
+        }
+
     }
 }
 export {};

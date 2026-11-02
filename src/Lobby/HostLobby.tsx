@@ -1,6 +1,5 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { useFilePicker } from "../Context/useFilePicker.tsx";
 
 import Gamebuttons from "../Gamebuttons/Gamebuttons.tsx";
 import GameOptions from "../GameOptions/GameOptions.tsx";
@@ -14,26 +13,14 @@ interface HostProps {
 }
 
 function HostLobby({lobby, setLobby, changeLobby}: HostProps ) {
-    const { infoText } = useFilePicker();
 
     async function sendGameInfo(){
         if(!lobby || !lobby.game) {
             console.log("error")
             return;
         }
-        connection.broadcast("GAMESTART", "hi")
-        const message = JSON.stringify({
-            game: lobby.game,
-            infoText: infoText,
-            rows : 10,
+        connection.broadcast("GAMESTART", {game: lobby.game})
 
-
-
-        });
-        console.log(message)
-        await window.steam.broadcastMessage(
-            message
-        );
     }
     const navigate = useNavigate()
     if (lobby === null) {

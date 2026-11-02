@@ -6,16 +6,17 @@ import {FilePickerProvider} from "./Context/FilePickerContext.tsx";
 
 
 import {MessageProvider} from "./hooks/MessageProvider.tsx";
+import GameInfoService from "./hooks/GameInfoService.tsx";
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
       <MessageProvider>
-      <FilePickerProvider>
-
+        <FilePickerProvider>
+         <GameInfoService/>
 
               <App />
 
-  </FilePickerProvider>
+         </FilePickerProvider>
       </MessageProvider>
   </StrictMode>,
 )

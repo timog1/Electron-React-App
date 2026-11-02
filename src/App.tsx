@@ -121,11 +121,11 @@ function App() {
                                 teams={getLobbyTeams()}
                                 owner={getLobbyOwner()}
                             members={getLobbyMembers()}
-                        />
+                         Options={getLobbyOptions()} playerId={playerId}/>
                     }
                 />
                 <Route
-                    path="/HostLobby/:lobbyI/2I1T"
+                    path="/PlayerLobby/:lobbyI/2I1T"
                     element={
 
                         <ZahlenErratenClient
@@ -133,7 +133,7 @@ function App() {
                             teams={getLobbyTeams()}
                             owner={getLobbyOwner()}
                             members={getLobbyMembers()}
-                        />
+                         Options={getLobbyOptions()} playerId={playerId}/>
                     }
                 />
                 <Route

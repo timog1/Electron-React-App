@@ -7,6 +7,7 @@ import { useLocation } from "react-router-dom";
 import {place_Image} from "./place_Image.ts"
 import {useGameRound} from "../hooks/useGameRound.tsx"
 import type {TierlistOptions} from "./TierlistOptions.ts";
+import {useGameInfoStore} from "../../hooks/GameInfoStore.ts";
 interface TierlistClientProps {
     Options: TierlistOptions | string;
     playerId: string;
@@ -22,32 +23,45 @@ type PlacedImage = {
 
 function TierlistClient({  members,playerId, Options }: TierlistClientProps) {
 
-    console.log("Options:" + Options);
-    console.log("Options:", Options);
-    console.log("Typ:", typeof Options);
+    const amountOfRounds = useGameInfoStore(
+        (state) => state.rounds
+    );
     const options: TierlistOptions =
         typeof Options === "string"
             ? JSON.parse(Options)
             : Options;
 
-    console.log("Parsed options:", options);
-    console.log("hostPlays:", options.hostPlays);
-    const {round, roundInfo}= useGameRound("client");
+
+    const {round, roundInfo}= useGameRound("client", amountOfRounds);
     const { state } = useLocation();
-    const amountOfRows = state.rows
-    const info = TierlistReader.parse(state.infoText)[round];
+
+    const roundInf = useGameInfoStore(
+        (state) => state.info.get(round)
+    );
+
+    console.log(round)
+    console.log(roundInf)
+    const info =    TierlistReader.parse(roundInf || "");
+    console.log(info)
     const currentImage = info[0]
     const currentText = info[1]
+    const resolvedRound = round - 1;
+
+    const resolvedRoundInfo = useGameInfoStore(
+        (store) => store.info.get(resolvedRound)
+    );
+    console.log(useGameInfoStore(
+        (state) => state.info
+    ))
     const [placedImages, setPlacedImages] = useState<PlacedImage[]>([]);
     useEffect(() => {
         if (!roundInfo) return;
 
         const positions = new Map(roundInfo);
 
-        const resolvedRound = round - 1;
 
         const info =
-            TierlistReader.parse(state.infoText)[resolvedRound];
+            TierlistReader.parse(resolvedRoundInfo || "");
 
         if (!info) return;
 
@@ -90,7 +104,7 @@ function TierlistClient({  members,playerId, Options }: TierlistClientProps) {
         <div className="container">
             <div className={"box"}>
             <Tierlist
-                amountOfRows={amountOfRows}
+                amountOfRows={amountOfRounds}
                 members={members}
                 placedImages={placedImages}
                 onCellClick={placeImage}

@@ -2,7 +2,13 @@
 import './ZahlenErraten.css'
 import type {TierlistOptions} from "../Tierlist/TierlistOptions.ts";
 import ZahlenErratenClient from "./ZahlenErratenClient.tsx";
-import {roundStart} from "./Hostlogic.ts";
+
+import {useGameRound} from "../hooks/useGameRound.tsx";
+import {useGameInfoStore} from "../../hooks/GameInfoStore.ts";
+
+import ZahlenErratenReader from "./ZahlenErratenReader.ts";
+import {giveroles} from "./Hostlogic.ts";
+import HostControls from "./Components/HostControls.tsx";
 
 
 interface TierlistProps{
@@ -15,13 +21,22 @@ interface TierlistProps{
 
 
 function ZahlenErratenHost({owner, Options, teams, playerId}: TierlistProps){
-    roundStart(teams, Frage);
-    useGameRound()
+    const amountOfRounds = useGameInfoStore(
+        (store) => store.rounds
+    );
+    const {round, nextRound} =     useGameRound("host", amountOfRounds)
 
+    const gameInfo = useGameInfoStore(
+        (store) => store.info.get(round)
+    );
+    const info = ZahlenErratenReader.parse(gameInfo ||"")
+    useGameRound("host")
+    giveroles(teams)
     return(
 
         <div>
-           <ZahlenErratenClient owner={owner} Options={Options} teams={teams} playerId={playerId}></ZahlenErratenClient>
+            <HostControls></HostControls>
+           <ZahlenErratenClient owner={owner} Options={Options} teams={teams} playerId={playerId} ></ZahlenErratenClient>
 
         </div>
     )

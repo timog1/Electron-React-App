@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import {connection} from "../../hooks/ConnectionLayer.ts";
+import {connection} from "../../../hooks/ConnectionLayer.ts";
 interface InputProps
 {
 
@@ -8,9 +8,11 @@ interface InputProps
 };
 function InputField({owner}: InputProps) {
     const [answer, setAnswer] = useState("");
-
+    console.log()
+    const [submitted, setSubmitted] = useState(false)
     function onPress(answer: string) {
-        connection.sendMessage(owner, "ZAHLEN_ERRATEN", answer);
+        setSubmitted(true)
+        connection.sendMessage(owner, "ZAHLEN_ERRATEN_ANTWORT", { antwort: answer});
     }
 
     function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -21,7 +23,7 @@ function InputField({owner}: InputProps) {
     return (
         <div className="zahlenstrahl">
             <form onSubmit={handleSubmit}>
-                <input
+                <input disabled={submitted}
                     type="text"
                     name="username"
                     placeholder="Answer"
@@ -29,7 +31,7 @@ function InputField({owner}: InputProps) {
                     onChange={(event) => setAnswer(event.target.value)}
                 />
 
-                <input type="submit" value="Submit" />
+                <input disabled={submitted} type="submit" value="Submit" />
             </form>
         </div>
     );

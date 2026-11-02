@@ -1,29 +1,23 @@
-import { useState, useCallback } from "react";
+import { useCallback } from "react";
 import { connection } from "./ConnectionLayer.ts";
 import { useGameMessage } from "./MessageProvider.tsx";
+import { useGameInfoStore } from "./GameInfoStore.ts";
 
-type GameInfoStart = {
-    contentVersion: number;
-    game: string;
-};
+import type { GameMessageMap } from "./messages.ts";
 
-type GameInfoMessage = {
-    contentVersion: number;
-    game: string;
-    info: string;
-};
+type GameInfoStart = GameMessageMap["GAMEINFO_START"];
+type GameInfoMessage = GameMessageMap["GAMEINFO"];
 
 function useSendInfo() {
-    const [info, setInfoState] = useState<Map<number, string>>(
-        () => new Map()
-    );
-    const [version, setVersion] = useState(0);
-    const [game, setGame] = useState("");
-
+    const info = useGameInfoStore((state) => state.info);
+    const version = useGameInfoStore((state) => state.version);
+    const game = useGameInfoStore((state) => state.game);
+    // const gameInfo = useGameInfoStore((state) => state.gameInfo);
     const setInfo = useCallback((messages: string[]) => {
-        const newVersion = version + 1;
+        const store = useGameInfoStore.getState();
 
-        setVersion(newVersion);
+        const newVersion = store.version + 1;
+        const currentGame = store.game;
 
         const newInfo = new Map<number, string>();
 
@@ -31,58 +25,61 @@ function useSendInfo() {
             newInfo.set(index, message);
         });
 
-        setInfoState(newInfo);
+        useGameInfoStore.setState({
+            rounds: messages.length,
+
+            version: newVersion,
+            info: newInfo,
+        });
 
         connection.broadcast("GAMEINFO_START", {
             contentVersion: newVersion,
-            game,
-            count: messages.length,
+            game: currentGame,
+            totalRounds: messages.length,
         });
 
         messages.forEach((message, index) => {
             connection.broadcast("GAMEINFO", {
                 contentVersion: newVersion,
-                game,
-                index,
+                game: currentGame,
+                round: index,
                 info: message,
             });
         });
-    }, [version, game]);
+    }, []);
 
     function startRes(message: { payload: GameInfoStart }) {
         const incomingVersion = message.payload.contentVersion;
+        const store = useGameInfoStore.getState();
 
-        if (incomingVersion < version) return;
+        if (incomingVersion < store.version) return;
 
-        setVersion(incomingVersion);
-        setGame(message.payload.game);
-        setInfoState(new Map());
+        useGameInfoStore.setState({
+            version: incomingVersion,
+            rounds: message.payload.totalRounds,
+            game: message.payload.game,
+            info: new Map(),
+        });
     }
 
     function receiveInfo(message: { payload: GameInfoMessage }) {
         const payload = message.payload;
+        const store = useGameInfoStore.getState();
 
-        if (payload.contentVersion !== version) return;
-        if (payload.game !== game) return;
+        if (payload.contentVersion !== store.version) return;
+        if (payload.game !== store.game) return;
 
-        setInfoState((previous) => {
-            const next = new Map(previous);
-            next.set(
-                // Der Index muss Teil der Nachricht sein, nicht die Version.
-                payload.contentVersion,
-                payload.info
-            );
-            return next;
+        useGameInfoStore.setState((state) => {
+            const next = new Map(state.info);
+
+            next.set(payload.round, payload.info);
+
+            return { info: next };
         });
     }
 
-    useGameMessage("GAMEINFO_START", (message) => {
-        startRes(message);
-    });
-
-    useGameMessage("GAMEINFO", (message) => {
-        receiveInfo(message);
-    });
+    useGameMessage("GAMEINFO_START", startRes);
+    useGameMessage("GAMEINFO", receiveInfo);
 
     return { info, version, game, setInfo };
 }

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+
 import { useNavigate } from "react-router-dom";
 import {useGameMessage} from "../hooks/MessageProvider.tsx";
 
@@ -10,34 +10,24 @@ interface PlayerProps {
 function PlayerLobby({ lobby, setLobby }: PlayerProps) {
     const navigate = useNavigate();
 
-        useGameMessage("GAMESTART", (message, from) => console.log(message))
-        console.log(lobby);
-        /*useEffect(() => {
-            const cleanup = window.steam.onMessage((msg) => {
-                console.log("MESSAGE:", msg);
+        useGameMessage("GAMESTART", (message) => {
+            const data = message.payload.game
+            console.log(data)
+            setLobby(prev => {
+                if (!prev) return null;
 
-                if (typeof msg.message === "string") {
-                    const data = JSON.parse(msg.message);
-
-                    console.log("GAME:", data.game);
-
-                    setLobby(prev => {
-                        if (!prev) return null;
-
-                        return {
-                            ...prev,
-                            game: data.game,
-                        };
-                    });
-
-                    navigate(`/PlayerLobby/${lobby?.id}/${data.game}`, {
-                        state: data
-                    });
-                }
+                return {
+                    ...prev,
+                    game: data,
+                };
             });
 
-            return cleanup;
-        }, []); */
+            navigate(`/PlayerLobby/${lobby?.id}/${data}`, {
+                state: data
+            });
+
+        })
+
 
 
 

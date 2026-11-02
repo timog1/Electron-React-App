@@ -1,58 +1,73 @@
 import './ZahlenErraten.css'
 import {useMemo, useState} from "react";
-import Skala from "./Skala.tsx";
-import HostControls from "./HostControls.tsx";
+import Skala from "./Components/Skala.tsx";
+import HostControls from "./Components/HostControls.tsx";
 import {useGameMessage} from "../../hooks/MessageProvider.tsx";
 import {connection} from "../../hooks/ConnectionLayer.ts";
 import type {TierlistOptions} from "../Tierlist/TierlistOptions.ts";
-import InputField from "./InputField.tsx";
+import InputField from "./Components/InputField.tsx";
 import {teamConnetion} from "../Functions/TeamMessages.ts"
 import {getTeam} from "../Functions/getTeam.ts";
+import {useGameInfoStore} from "../../hooks/GameInfoStore.ts";
+import {useGameRound} from "../hooks/useGameRound.tsx";
+import ZahlenErratenReader from "./ZahlenErratenReader.ts";
+import ZahlenErratenRater from "./ZahlenErratenRater.tsx";
+import ZahlenErratenAntworter from "./ZahlenErratenAntworter.tsx";
 interface TierlistProps{
     playerId: string;
-    members: SteamLobbyMember[] | null;
+
     Options: TierlistOptions | string;
     owner: string | null;
     teams: Record<string, string[]>;
 }
 
-function ZahlenErratenClient({owner, Options, teams, playerId}: TierlistProps){
-
-
-    const value = useMemo(() => {
+function ZahlenErratenClient({owner, Options, teams, playerId}: TierlistProps) {
+    const rounds = useGameInfoStore(
+        (store) => store.rounds
+    );
+    const {round} = useGameRound("client", rounds)
+    console.log(teams)
+    const team: string | undefined = useMemo(() => {
         return getTeam(teams, playerId);
     }, [teams]);
+    let teamMates: string[] = []
+
+    if (team){
+        teamMates = teams[team]
+    }
+    console.log(teamMates)
+    const gameInfo = useGameInfoStore(
+        (store) => store.info.get(round)
+    );
     const [role, setRole] = useState("")
-    const [frage, setFrage] = useState("")
-    const [answer, setAnswer] = useState<number>()
+    const [number, setNumber] = useState(0)
+    const info = ZahlenErratenReader.parse(gameInfo ||"")
     //connection.broadcast()
     function onSendInfo(message, from){
         teamConnetion.sendToEach(message, teams, from)
         connection.sendMessage(message, owner)
     }
-    function onMessage(message, from) {
 
-    }
-    const [changeState, setChangeState] = useState("F")
-    const [form, setForm] = useState()
-    useGameMessage("ZAHLEN_ERRATEN_ROLE", (message, from) => {setRole(message.payload.role)});
-    useGameMessage("ZAHLEN_ERRATEN_FRAGE", (message, from) => {setFrage(message.payload.frage)});
-    useGameMessage("ZAHLEN_ERRATEN_NUMBER", (message, from) => {setAnswer(message.payload.number)});
+
+
+    useGameMessage("ZAHLEN_ERRATEN_ROLE", (message, from) => {setRole(message.payload.role); setNumber(message.payload.number)});
 
     return(
 
         <div>
-            <p className={frage}></p>
+            <p>hi</p>
+            <p className={info.frage}>{info.frage}</p>
             <p>{role}</p>
-            <p>{answer}</p>
-            { (changeState === "F") &&(
-                <HostControls></HostControls>
+
+
+            { (role === "picker") &&(
+                <ZahlenErratenAntworter owner={owner} zahl={number}> </ZahlenErratenAntworter>
             )}
-            {changeState === "F" ? (
-                <InputField owner={owner}></InputField>
-            ) : (
-                <Skala firstNumber={1} lastNumber={10} owner={owner}></Skala>
-            )}
+            {role === "rater" && (
+                <ZahlenErratenRater owner={owner} teamMates={teamMates}></ZahlenErratenRater>
+            )
+
+            }
 
         </div>
     )

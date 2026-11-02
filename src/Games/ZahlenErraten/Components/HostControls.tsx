@@ -1,5 +1,5 @@
 
-import './ZahlenErraten.css'
+import '../ZahlenErraten.css'
 
 
 

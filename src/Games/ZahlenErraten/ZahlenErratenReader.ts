@@ -6,18 +6,14 @@ type ZahlenErratenInfo = {
 };
 
 export default class ZahlenErratenReader {
-    static parse(infos: string): ZahlenErratenInfo[] {
-        return infos
-            .split(/\r?\n/)
-            .filter(Boolean)
-            .map((line) => {
-                const test = line.split("|");
+    static parse(infos: string): ZahlenErratenInfo {
+        const info =  infos.split("|");
 
                 return {
-                    frage: test[0]?.trim() ?? "",
-                    one: test[1]?.trim() || "worst",
-                    ten: test[2]?.trim() || "best",
+                    frage: info[0]?.trim() ?? "",
+                    one: info[1]?.trim() || "worst",
+                    ten: info[2]?.trim() || "best",
                 };
-            });
+
     }
 }

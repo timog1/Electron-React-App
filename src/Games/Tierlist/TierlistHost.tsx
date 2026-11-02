@@ -7,6 +7,7 @@ import TierlistReader from "./TierlistReader.ts";
 import {useGameRound} from "../hooks/useGameRound.tsx";
 import {place_Image} from "./place_Image.ts";
 import type {TierlistOptions} from "./TierlistOptions.ts";
+import {useGameInfoStore} from "../../hooks/GameInfoStore.ts";
 export interface TierlistHostProps {
     amountOfRows: number;
     members: SteamLobbyMember[] | null;
@@ -36,7 +37,9 @@ function TierlistHost({
 
     const [placedImages, setPlacedImages] =
         useState<PlacedImage[]>([]);
-
+    amountOfRows = useGameInfoStore(
+        (store) => store.rounds
+    );
     const [roundImages, setRoundImages] =
         useState<Map<string, number>>(new Map());
     const { infoText } = useFilePicker();
@@ -49,7 +52,9 @@ function TierlistHost({
         isLastRound
     } = useGameRound("host", all.length);
 
-    const allInfo = all[round]
+    const allInfo = TierlistReader.parse(useGameInfoStore(
+        (store) => store.info.get(round) ||""
+    ));
 
 
     const currentImage = allInfo[0];

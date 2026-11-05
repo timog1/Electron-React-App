@@ -1,17 +1,18 @@
 
+
 import '../ZahlenErraten.css'
 
-
-
-
-
-function HostControls(){
+type HostControlsProps = {
+    reveal: () => void;
+    nextRound: () =>void;
+};
+function HostControls({reveal, nextRound}: HostControlsProps){
 
     return(
 
         <div>
-            <button>next</button>
-
+            <button onClick={reveal}>reveal</button>
+            <button onClick={() => nextRound()}>nextRound</button>
         </div>
     )
 }

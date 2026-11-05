@@ -6,13 +6,13 @@ import {useState} from "react";
 
 interface zahlenAntowrtProps
 {
-
+    team: string[];
     owner: string;
     zahl: number | null;
 };
 
 
-function ZahlenErratenAntworter({owner, zahl}: zahlenAntowrtProps){
+function ZahlenErratenAntworter({team, owner, zahl}: zahlenAntowrtProps){
     console.log("antwortowner" +owner)
     const [number, setNumber] = useState<number | null>(null)
     useGameMessage("ZAHLEN_ERRATEN_NUMBER", (message) => {
@@ -25,7 +25,7 @@ function ZahlenErratenAntworter({owner, zahl}: zahlenAntowrtProps){
 
         <div>
             <p>{zahl}</p>
-            <InputField owner={owner}></InputField>
+            <InputField team={team} owner={owner}></InputField>
             <p>Dein Team Pick: {number}</p>
         </div>
     )

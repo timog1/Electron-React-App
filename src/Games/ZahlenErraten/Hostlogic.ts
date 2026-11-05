@@ -9,15 +9,15 @@ export function giveroles(teams: Record<string, string[]>) {
         if (team.length === 0) continue;
 
         const picker = Math.floor(Math.random() * team.length);
-
         for (const player of team) {
             if (player === team[picker]) {
-                connection.sendMessage(team[picker], "ZAHLEN_ERRATEN_ROLE", {role: "picker", number: num})
+                connection.sendMessage(player, "ZAHLEN_ERRATEN_ROLE", {role: "picker", number: num})
             } else {
-                connection.sendMessage(team[picker], "ZAHLEN_ERRATEN_ROLE",{role:  "rater"})
+                connection.sendMessage(player, "ZAHLEN_ERRATEN_ROLE",{role:  "rater", number: null})
             }
         }
     }
+    return num;
 }
 /*export function givepoints(perfect, next){
     if(number == guess) {

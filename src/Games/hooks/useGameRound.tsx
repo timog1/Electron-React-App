@@ -1,70 +1,121 @@
-import { useEffect, useState } from "react";
-import {useNavigate} from "react-router-dom";
+
+import { useCallback, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+type GameRole = "host" | "client";
+
+type GameMessage =
+    | {
+    type: "next";
+    round: number;
+    message: unknown;
+}
+    | {
+    type: "end";
+};
 
 export function useGameRound(
-    role: "host" | "client",
+    role: GameRole,
     maxRounds?: number
 ) {
     const [round, setRound] = useState(0);
+    const [roundInfo, setInfo] = useState<unknown>();
     const [isLastRound, setIsLastRound] = useState(false);
-    const [roundInfo, setInfo] = useState<unknown | undefined>(undefined);
-    const navigate = useNavigate()
-    async function nextRound(newInfo?: unknown) {
-        const message = JSON.stringify({
-            type: "next",
-            message: newInfo,
+
+    const navigate = useNavigate();
+
+    const handleReturn = useCallback(() => {
+        // Navigiert eine Route nach oben
+        navigate("..", {
+            relative: "path",
+            replace: true,
         });
+    }, [navigate]);
 
-        await window.steam.broadcastMessage(message);
+    const handleNext = useCallback(
+        (data: Extract<GameMessage, { type: "next" }>) => {
+            setRound(data.round);
+            setInfo(data.message);
 
+            setIsLastRound(
+                maxRounds !== undefined &&
+                data.round >= maxRounds
+            );
+        },
+        [maxRounds]
+    );
 
+    const nextRound = useCallback(
+        async (newInfo?: unknown) => {
+            // Wenn wir bereits in der letzten Runde sind:
+            // Spiel beenden und Host + Clients zurück navigieren
+            if (
+                maxRounds !== undefined &&
+                round >= maxRounds
+            ) {
+                const message: GameMessage = {
+                    type: "end",
+                };
 
-        setRound(prev => {
-            if (maxRounds !== undefined && prev >= maxRounds - 1) {
-               handleReturn()
+                await window.steam.broadcastMessage(
+                    JSON.stringify(message)
+                );
+
+                handleReturn();
+                return;
             }
-            if(maxRounds !== undefined && prev -1 >= maxRounds - 1){
-                setIsLastRound (true)
-            }
-            return prev + 1;
-        });
-    }
-    const handleReturn = () => {
 
-        const path = window.location.pathname;
-        const slashCount = (path.match(/\//g) || []).length;
+            const nextRoundNumber = round + 1;
 
-        if (slashCount === 3) {
-            navigate(path.substring(0, path.lastIndexOf("/")));
-        }
-    };
+            const message: GameMessage = {
+                type: "next",
+                round: nextRoundNumber,
+                message: newInfo ?? "",
+            };
+
+            // Nachricht an alle Clients senden
+            await window.steam.broadcastMessage(
+                JSON.stringify(message)
+            );
+
+            // Host aktualisiert sich selbst
+            handleNext(message);
+        },
+        [round, maxRounds, handleNext, handleReturn]
+    );
+
     useEffect(() => {
         if (role !== "client") {
             return;
         }
 
-        return window.steam.onMessage((message) => {
-            if (! (typeof message.message === "string"))  return;
-                const data = JSON.parse(message.message);
+        return window.steam.onMessage((incomingMessage) => {
+            if (typeof incomingMessage.message !== "string") {
+                return;
+            }
+
+            let data: GameMessage;
+
+            try {
+                data = JSON.parse(incomingMessage.message);
+            } catch {
+                return;
+            }
 
             if (data.type === "next") {
-                setInfo(data.message);
+                handleNext(data);
+            }
 
-                setRound(prev => {
-                    if (maxRounds !== undefined && prev >= maxRounds - 1) {
-                        return -1;
-                    }
-
-                    return prev + 1;
-                });
+            if (data.type === "end") {
+                handleReturn();
             }
         });
-    }, [role, maxRounds]);
+    }, [role, handleNext, handleReturn]);
 
     return {
         round,
         roundInfo,
         nextRound,
-        isLastRound
+        isLastRound,
     };
 }

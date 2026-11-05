@@ -1,12 +1,18 @@
+import type {GameMessageMap} from "../../hooks/messages.ts";
 import {connection} from "../../hooks/ConnectionLayer.ts";
 
-export const teamConnetion = {
-    sendToEach(message: string, team: any, except: string | any[])
-{
-    for (const player of team) {
-        if (!except.includes(player)) {
-            connection.sendMessage(message, player);
+export const teamConnection = {
+    sendToEach<K extends keyof GameMessageMap>(
+        team: string[],
+        except: string | string[],
+        ...args: [type: K, payload: GameMessageMap[K]]
+    ) {
+        const excluded = Array.isArray(except) ? except : [except];
+
+        for (const player of team) {
+            if (!excluded.includes(player)) {
+                connection.sendMessage(player, ...args);
+            }
         }
-    }
-}
-}
+    },
+};

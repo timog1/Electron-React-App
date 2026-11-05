@@ -1,18 +1,20 @@
 
 import { useState } from "react";
 import {connection} from "../../../hooks/ConnectionLayer.ts";
+import {teamConnection} from "../../Functions/TeamMessages.ts";
 interface InputProps
 {
-
+    team: string[];
     owner: string;
 };
-function InputField({owner}: InputProps) {
+function InputField({team, owner}: InputProps) {
     const [answer, setAnswer] = useState("");
     console.log()
     const [submitted, setSubmitted] = useState(false)
     function onPress(answer: string) {
         setSubmitted(true)
-        connection.sendMessage(owner, "ZAHLEN_ERRATEN_ANTWORT", { antwort: answer});
+        teamConnection.sendToEach(team,[],  "ZAHLEN_ERRATEN_ANTWORT", { antwort: answer})
+        connection.sendMessage(owner, "ZAHLEN_ERRATEN_HOSTINFO", { antwort: answer, number: null});
     }
 
     function handleSubmit(event: React.FormEvent<HTMLFormElement>) {

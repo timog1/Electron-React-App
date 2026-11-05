@@ -2,6 +2,7 @@
 import '../Skala.css'
 import {connection} from "../../../hooks/ConnectionLayer.ts";
 import {useState} from "react";
+import {teamConnection} from "../../Functions/TeamMessages.ts";
 
 
 interface SkalaProps
@@ -19,18 +20,14 @@ function Skala({firstNumber, lastNumber, owner, teamMates}: SkalaProps){
     const [submitted, setSubmitted] = useState(false)
     function onPress(zahl: number){
         setNumber(zahl)
-        connection.sendMessage(owner, "ZAHLEN_ERRATEN_NUMBER", {number: zahl})
-        console.log(teamMates)
-        if(teamMates.length == 0) return;
-        for (const player of teamMates){
-            console.log(player)
-            connection.sendMessage(player, "ZAHLEN_ERRATEN_NUMBER", {number: zahl})
-        }
-
+        connection.sendMessage(owner, "ZAHLEN_ERRATEN_HOSTINFO", {antwort: null, number: zahl})
+        teamConnection.sendToEach(teamMates, [], "ZAHLEN_ERRATEN_NUMBER", {number: zahl})
     }
     function onPressSubmit(){
         setSubmitted(true)
-        connection.sendMessage(owner, "ZAHLEN_ERRATEN_SUBMIT", {number: number})
+        connection.sendMessage(owner, "ZAHLEN_ERRATEN_HOSTINFO", {antwort: null, number: number})
+        connection.sendMessage(owner, "ZAHLEN_ERRATEN_SUBMIT", {antwort: ""})
+
     }
 
     return(

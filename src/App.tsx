@@ -5,8 +5,9 @@ import Startscreen from "./Startscreen";
 import HostLobby from "./Lobby/HostLobby.tsx";
 import PlayerLobby from "./Lobby/PlayerLobby.tsx";
 import TierlistClient from "./Games/Tierlist/TierlistClient.tsx"
-import ZahlenErratenHost from "./Games/ZahlenErraten/ZahlenErratenHost.tsx";
-import ZahlenErratenClient from "./Games/ZahlenErraten/ZahlenErratenClient.tsx";
+import ZahlenErratenHost from "./Games/ZahlenErraten/Pages/ZahlenErratenHost.tsx";
+import ZahlenErratenClient from "./Games/ZahlenErraten/Pages/ZahlenErratenClient.tsx";
+import ZahlenErratenPlayer from "./Games/ZahlenErraten/Pages/ZahlenErratenPlayer.tsx";
 
 function App() {
     const [playerName, setPlayerName] = useState("");
@@ -62,8 +63,8 @@ function App() {
         return lobby.members
     }
     function getLobbyTeams(){
-        if(!lobby) return null;
-        return lobby.teams
+        if(!lobby) return {};
+        return  lobby.teams
     }
     function getLobbyOwner(){
         if(!lobby) return null;
@@ -128,7 +129,7 @@ function App() {
                     path="/PlayerLobby/:lobbyI/2I1T"
                     element={
 
-                        <ZahlenErratenClient
+                        <ZahlenErratenPlayer
 
                             teams={getLobbyTeams()}
                             owner={getLobbyOwner()}

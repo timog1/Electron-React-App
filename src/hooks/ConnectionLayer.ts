@@ -1,13 +1,7 @@
-
 import type {
     GameMessageMap,
     GameMessageArgs,
-} from "./protocol";
-
-const listeners = new Map<
-    keyof GameMessageMap,
-    Set<(payload: never) => void>
->();
+} from "./messages.ts";
 
 function encode(...args: GameMessageArgs): string {
     const [type, payload] = args;
@@ -21,33 +15,18 @@ function encode(...args: GameMessageArgs): string {
 }
 
 export const connection = {
-    broadcast(...args: GameMessageArgs) {
+    broadcast<K extends keyof GameMessageMap>(
+        ...args: [type: K, payload: GameMessageMap[K]]
+    ) {
         window.steam.broadcastMessage(encode(...args));
     },
 
-    sendMessage(peerId: string, ...args: GameMessageArgs) {
-        window.steam.sendMessage(
-            peerId,
-            encode(...args)
-        );
-    },
-
-    on<K extends keyof GameMessageMap>(
-        type: K,
-        callback: (payload: GameMessageMap[K]) => void
+    sendMessage<K extends keyof GameMessageMap>(
+        peerId: string,
+        ...args: [type: K, payload: GameMessageMap[K]]
     ) {
-        let handlers = listeners.get(type);
-
-        if (!handlers) {
-            handlers = new Set();
-            listeners.set(type, handlers);
-        }
-
-        const handler = callback as (payload: never) => void;
-        handlers.add(handler);
-
-        return () => {
-            handlers?.delete(handler);
-        };
+        window.steam.sendMessage(peerId, encode(...args));
     },
+
+
 };

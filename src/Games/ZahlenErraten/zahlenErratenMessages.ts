@@ -19,6 +19,19 @@ declare module "../../hooks/messages.ts" {
             antwort: string;
 
         }
+        ZAHLEN_ERRATEN_AUFLÖSUNG:{
+            antwort: string;
+            gegnerAntwort: string;
+            number: number;
+            answerNumber: number;
+            gegnerAnswerNumber: number;
+
+        }
+        ZAHLEN_ERRATEN_HOSTINFO:{
+            antwort: string | null;
+            number: number | null;
+
+        }
 
     }
 }
